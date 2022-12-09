@@ -1,4 +1,4 @@
-package h2tp
+package ink
 
 const (
 	StatusContinue           = 100 // RFC 7231, 6.2.1

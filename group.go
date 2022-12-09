@@ -1,4 +1,4 @@
-package h2tp
+package ink
 
 import "strings"
 

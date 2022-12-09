@@ -1,7 +1,7 @@
-package h2tp
+package ink
 
 import (
-	"github.com/zzztttkkk/h2tp/internal/utils"
+	"github.com/zzztttkkk/ink/internal/utils"
 	"net/http"
 	"reflect"
 )

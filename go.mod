@@ -1,4 +1,4 @@
-module github.com/zzztttkkk/h2tp
+module github.com/zzztttkkk/ink
 
 go 1.18
 

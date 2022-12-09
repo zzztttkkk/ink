@@ -1,4 +1,4 @@
-package h2tp
+package ink
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/zzztttkkk/h2tp/internal/utils"
+	"github.com/zzztttkkk/ink/internal/utils"
 )
 
 type RecoverFunc func(v any) Error
