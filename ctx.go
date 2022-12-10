@@ -3,7 +3,9 @@ package ink
 import (
 	"context"
 	"github.com/julienschmidt/httprouter"
+	"github.com/zzztttkkk/ink/internal/vld"
 	"net/http"
+	"reflect"
 	"time"
 )
 
@@ -30,18 +32,7 @@ func (rctx *RequestCtx) NoTempResponse() bool { return rctx.noTempResponse }
 
 var _ context.Context = (*RequestCtx)(nil)
 
-type Handler interface {
-	Handle(rctx *RequestCtx)
+func (rctx *RequestCtx) BindAndValidate(dist any) error {
+	v := reflect.ValueOf(dist)
+	return vld.GetRules(v.Type().Elem()).BindAndValidate(rctx.Request, v.Elem())
 }
-
-type HandlerFunc func(rctx *RequestCtx)
-
-func (f HandlerFunc) Handle(rctx *RequestCtx) { f(rctx) }
-
-type Middleware interface {
-	Handle(rctx *RequestCtx, next func())
-}
-
-type MiddlewareFunc func(rctx *RequestCtx, next func())
-
-func (f MiddlewareFunc) Handle(rctx *RequestCtx, next func()) { f(rctx, next) }
