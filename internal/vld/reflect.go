@@ -437,9 +437,6 @@ func GetRules(t reflect.Type) *Rules {
 	}
 	cache[t] = rules
 	for _, info := range tm.Index {
-		if len(info.Index) > 1 {
-			continue
-		}
 		rules.Data = append(rules.Data, utils.Must(infoToRule(info, nil)))
 	}
 	return rules

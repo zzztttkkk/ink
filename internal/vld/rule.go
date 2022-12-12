@@ -2,6 +2,7 @@ package vld
 
 import (
 	"errors"
+	"fmt"
 	"github.com/zzztttkkk/ink/internal/utils"
 	"html"
 	"mime/multipart"
@@ -338,6 +339,10 @@ func fromReq(t reflect.Type, req *http.Request) (reflect.Value, *Error) {
 func (rules *Rules) BindAndValidate(req *http.Request, dist reflect.Value) error {
 	var err Error
 	for _, rule := range rules.Data {
+		if len(rule.Index) > 1 {
+			continue
+		}
+
 		if rule.RuleType == RuleTypeBinder {
 			vv, ep := fromReq(rule.Gotype, req)
 			if ep != nil {
@@ -370,5 +375,20 @@ func (rules *Rules) BindAndValidate(req *http.Request, dist reflect.Value) error
 }
 
 func (rules *Rules) Validate(v any) error {
+	vv := reflect.ValueOf(v)
+	for vv.Kind() == reflect.Pointer {
+		vv = vv.Elem()
+	}
+
+	for _, rule := range rules.Data {
+		fv, err := vv.FieldByIndexErr(rule.Index)
+		if err != nil {
+			if rule.Optional {
+				continue
+			}
+			return &Error{Type: ErrorTypeMissRequired, Rule: rule}
+		}
+		fmt.Println(rule.Name, fv)
+	}
 	return nil
 }

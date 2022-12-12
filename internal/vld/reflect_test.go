@@ -14,7 +14,7 @@ type AB struct {
 	B string
 }
 
-func (ab *AB) FromRequest(req *http.Request) *Error {
+func (ab *AB) FromRequest(_ *http.Request) *Error {
 	ab.A = fmt.Sprintf("%d", time.Now().UnixNano())
 	ab.B = fmt.Sprintf("%d", time.Now().UnixNano())
 	return nil
@@ -22,20 +22,20 @@ func (ab *AB) FromRequest(req *http.Request) *Error {
 
 type C string
 
-func (c *C) FromRequest(req *http.Request) *Error {
+func (c *C) FromRequest(_ *http.Request) *Error {
 	*c = C(fmt.Sprintf("%d", time.Now().UnixNano()))
 	return nil
 }
 
 type User struct {
-	//Name      string    `vld:"name;RuneCountRange=1-20"`
-	//Email     string    `vld:"email"`
-	//Age       int       `vld:"age"`
-	//CreatedAt time.Time `vld:"created_at"`
-	//Nums      []int     `vld:"nums;NumRange=1-30;LenRange=4-4"`
-	AB1 AB  `vld:"ab"`
-	AB2 *AB `vld:"ab_ptr"`
-	C2  *C  `vld:"c_ptr"`
+	Name      string    `vld:"name;RuneCountRange=1-20"`
+	Email     string    `vld:"email"`
+	Age       int       `vld:"age"`
+	CreatedAt time.Time `vld:"created_at"`
+	Nums      []int     `vld:"nums;NumRange=1-30;LenRange=4-4"`
+	AB1       AB        `vld:"ab"`
+	AB2       *AB       `vld:"ab_ptr"`
+	C2        *C        `vld:"c_ptr"`
 }
 
 func TestGetRules(t *testing.T) {
@@ -54,5 +54,16 @@ func TestGetRules(t *testing.T) {
 		fmt.Println(e)
 	} else {
 		fmt.Printf("%#v\n", user)
+	}
+}
+
+func TestValidate(t *testing.T) {
+	v := User{
+		Name:  "ztk",
+		Email: "ztk@local.dev",
+	}
+
+	if err := GetRules(reflect.TypeOf(v)).Validate(&v); err != nil {
+		fmt.Println(err)
 	}
 }
