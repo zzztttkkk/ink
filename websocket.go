@@ -1,26 +1,29 @@
 package ink
 
-import "nhooyr.io/websocket"
+import (
+	"github.com/gobwas/ws"
+	"github.com/gobwas/ws/wsutil"
+	"net"
+)
 
-type WebSocketConn websocket.Conn
-type WebSocketAcceptOptions websocket.AcceptOptions
-
-type WebSocketHandler interface {
-	Handle(c *WebSocketConn)
+type WsServerSideConn struct {
+	conn net.Conn
 }
 
-type WebSocketHandlerFunc func(*WebSocketConn)
+func (c *WsServerSideConn) Read() ([]byte, ws.OpCode, error) { return wsutil.ReadClientData(c.conn) }
 
-func (w WebSocketHandlerFunc) Handle(c *WebSocketConn) { w(c) }
+func (c *WsServerSideConn) Write(op ws.OpCode, data []byte) error {
+	return wsutil.WriteServerMessage(c.conn, op, data)
+}
 
-func Ws(handler WebSocketHandler, opts *WebSocketAcceptOptions) Handler {
+func Ws() Handler {
 	return HandlerFunc(func(rctx *RequestCtx) {
 		rctx.noTempResponse = true
-		c, err := websocket.Accept(rctx.rw, rctx.Request, (*websocket.AcceptOptions)(opts))
+		c, _, _, err := ws.UpgradeHTTP(rctx.Request, rctx.rw)
 		if err != nil {
 			return
 		}
-		defer c.Close(websocket.StatusNormalClosure, "")
-		handler.Handle((*WebSocketConn)(c))
+		defer c.Close()
+
 	})
 }
