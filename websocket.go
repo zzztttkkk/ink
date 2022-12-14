@@ -1,8 +1,8 @@
 package ink
 
 import (
-	"github.com/gobwas/ws"
-	"github.com/gobwas/ws/wsutil"
+	"github.com/zzztttkkk/ink/internal/vender/ws"
+	"github.com/zzztttkkk/ink/internal/vender/ws/wsutil"
 	"net"
 )
 
@@ -24,6 +24,5 @@ func Ws() Handler {
 			return
 		}
 		defer c.Close()
-
 	})
 }
