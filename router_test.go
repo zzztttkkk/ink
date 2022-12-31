@@ -34,8 +34,6 @@ func TestRun(t *testing.T) {
 		fmt.Println("Middleware B After", time.Now().UnixNano())
 	}))
 
-	router.Register(http.MethodGet, "/static/*filepath", Fs("./", OsDirOpts{URLPrefix: "/static"}))
-
 	group := NewGroup("/account")
 	group.Use(MiddlewareFunc(func(rctx *RequestCtx, next func()) {
 		fmt.Println("Middleware Group A")

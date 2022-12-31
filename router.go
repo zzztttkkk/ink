@@ -127,7 +127,9 @@ func (r *Router) Register(methods string, pattern string, handler Handler) {
 					}
 
 					writer.WriteHeader(rctx.Response.StatusCode)
-					_, _ = writer.Write(rctx.Response.buf.Bytes())
+					if rctx.Response.buf != nil {
+						_, _ = writer.Write(rctx.Response.buf.Bytes())
+					}
 				}
 			}()
 
@@ -135,6 +137,18 @@ func (r *Router) Register(methods string, pattern string, handler Handler) {
 			handler.Handle(&rctx)
 		})
 	}
+}
+
+func (r *Router) RegisterFs(methods string, prefix string, filesystem any, opts *FsOpts) {
+	if !strings.HasSuffix(prefix, "/") {
+		panic(fmt.Sprintf("bad prefix, `%s`", prefix))
+	}
+	prefix += fmt.Sprintf("*%s", filepathArgName)
+	var optsVal FsOpts
+	if opts != nil {
+		optsVal = *opts
+	}
+	r.Register(methods, prefix, makeFsHandler(filesystem, optsVal))
 }
 
 func (r *Router) AddGroup(group *Group) {
