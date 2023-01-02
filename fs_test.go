@@ -6,7 +6,7 @@ import (
 
 func TestFs(t *testing.T) {
 	router := NewRouter()
-	router.RegisterFs("*", "/static/", "./", nil)
+	router.RegisterFs("*", "./", nil)
 
 	_ = Run("127.0.0.1:80", map[string]*Router{"*": router})
 }

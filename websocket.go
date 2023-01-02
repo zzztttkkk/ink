@@ -16,7 +16,7 @@ func (c *WsServerSideConn) Write(op ws.OpCode, data []byte) error {
 	return wsutil.WriteServerMessage(c.conn, op, data)
 }
 
-func Ws() Handler {
+func makeWsHandler() Handler {
 	return HandlerFunc(func(rctx *RequestCtx) {
 		rctx.noTempResponse = true
 		c, _, _, err := ws.UpgradeHTTP(rctx.Request, rctx.rw)

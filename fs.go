@@ -9,6 +9,8 @@ import (
 )
 
 type FsOpts struct {
+	URLPrefix     string
+	PreCheck      func(ctx *RequestCtx) bool
 	DisableIndex  bool
 	IndexRenderer func(rctx *RequestCtx, infos []fs.FileInfo)
 }
@@ -25,9 +27,7 @@ func makeFsHandler(anyFs any, opt FsOpts) Handler {
 	fsv := reflect.ValueOf(anyFs)
 	if fsv.Kind() == reflect.String {
 		fsv = reflect.ValueOf(http.Dir(raw.(string)))
-	}
-
-	if fsv.Type().Implements(ioFsType) {
+	} else if fsv.Type().Implements(ioFsType) {
 		fsv = reflect.ValueOf(http.FS(fsv.Interface().(fs.FS)))
 	}
 
@@ -39,6 +39,12 @@ func makeFsHandler(anyFs any, opt FsOpts) Handler {
 	server := http.FileServer(httpfs)
 	return HandlerFunc(func(rctx *RequestCtx) {
 		rctx.Request.URL.Path = rctx.PathParams.ByName(filepathArgName)
+		if opt.PreCheck != nil && !opt.PreCheck(rctx) {
+			rctx.noTempResponse = true
+			rctx.rw.WriteHeader(StatusForbidden)
+			return
+		}
+
 		maybeDir := strings.HasSuffix(rctx.Request.URL.Path, "/")
 		if opt.DisableIndex && maybeDir {
 			rctx.rw.WriteHeader(StatusMovedPermanently)

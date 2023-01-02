@@ -139,15 +139,22 @@ func (r *Router) Register(methods string, pattern string, handler Handler) {
 	}
 }
 
-func (r *Router) RegisterFs(methods string, prefix string, filesystem any, opts *FsOpts) {
-	if !strings.HasSuffix(prefix, "/") {
-		panic(fmt.Sprintf("bad prefix, `%s`", prefix))
-	}
-	prefix += fmt.Sprintf("*%s", filepathArgName)
+func (r *Router) RegisterFs(methods string, filesystem any, opts *FsOpts) {
 	var optsVal FsOpts
 	if opts != nil {
 		optsVal = *opts
 	}
+
+	prefix := optsVal.URLPrefix
+	if len(prefix) == 0 {
+		prefix = "/static/"
+	}
+
+	if !strings.HasPrefix(prefix, "/") || !strings.HasSuffix(prefix, "/") {
+		panic(fmt.Sprintf("bad prefix, `%s`", prefix))
+	}
+	prefix += fmt.Sprintf("*%s", filepathArgName)
+
 	r.Register(methods, prefix, makeFsHandler(filesystem, optsVal))
 }
 
