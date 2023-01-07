@@ -158,6 +158,10 @@ func (r *Router) RegisterFs(methods string, filesystem any, opts *FsOpts) {
 	r.Register(methods, prefix, makeFsHandler(filesystem, optsVal))
 }
 
+func (r *Router) RegisterWs(pattern string, handler WsHandler) {
+	r.Register("*", pattern, makeWsHandler(handler))
+}
+
 func (r *Router) AddGroup(group *Group) {
 	for _, info := range group.infos {
 		methods, pattern, handler := info.methods, info.pattern, info.handler
