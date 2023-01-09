@@ -184,6 +184,7 @@ func (c Conn) ReadMsg() *Message {
 		case 5:
 			{
 				msg.Ext = c.readMap()
+				stop = true
 				continue
 			}
 		default:
