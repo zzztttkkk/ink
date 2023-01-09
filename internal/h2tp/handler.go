@@ -1,4 +1,4 @@
-package ink
+package h2tp
 
 type Handler interface {
 	Handle(rctx *RequestCtx)

@@ -1,4 +1,4 @@
-package ink
+package h2tp
 
 import (
 	"github.com/zzztttkkk/ink/internal/utils"

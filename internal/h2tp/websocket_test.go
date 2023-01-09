@@ -1,4 +1,4 @@
-package ink
+package h2tp
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 func TestWebsocket(t *testing.T) {
 	router := NewRouter()
 
-	router.RegisterWs("/ws", WsHandlerFunc(func(conn *WsServerSideConn) {
+	router.RegisterWs("/ws", WsHandlerFunc(func(conn *WsConn) {
 		for {
 			data, opcode, e := conn.Read()
 			if e != nil {

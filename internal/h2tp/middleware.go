@@ -1,4 +1,4 @@
-package ink
+package h2tp
 
 type Middleware interface {
 	Handle(rctx *RequestCtx, next func())
