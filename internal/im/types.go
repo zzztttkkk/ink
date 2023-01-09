@@ -2,29 +2,28 @@ package im
 
 import "net"
 
-type UserIdentify interface {
-	String() string
-}
-
 type MessageType int
 
 const (
-	MessageTypePlainTxt = MessageType(iota)
+	messageTypeMin = MessageType(iota)
+	messageTypeUndefined
+	MessageTypePlainTxt
 	MessageTypeHTML
 	MessageTypeJSON
 	MessageTypeImage
 	MessageTypeAudio
 	MessageTypeVideo
 	MessageTypeBlob
+	messageTypeMax
 )
 
 type Message struct {
-	From    UserIdentify   `json:"from"`
-	Unix    int64          `json:"unix"`
-	Until   int64          `json:"until,omitempty"`
-	Type    MessageType    `json:"type"`
-	Content string         `json:"content,omitempty"`
-	Ext     map[string]any `json:"ext,omitempty"`
+	From    uint64
+	Unix    uint64
+	Until   uint64
+	Type    MessageType
+	Content []byte
+	Ext     map[string]string
 }
 
 type Channel struct {
