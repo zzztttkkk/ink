@@ -2,7 +2,9 @@ package im
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/binary"
+	"github.com/zzztttkkk/ink/internal/utils"
 	"strings"
 )
 
@@ -178,13 +180,13 @@ func (c Conn) ReadMsg() *Message {
 			}
 		case 4:
 			{
-				c.readBytes(&msg.Content)
+				msg.Ext = c.readMap()
+				stop = true
 				continue
 			}
 		case 5:
 			{
-				msg.Ext = c.readMap()
-				stop = true
+				c.readBytes(&msg.Content)
 				continue
 			}
 		default:
@@ -200,6 +202,12 @@ func (c Conn) ReadMsg() *Message {
 	return &msg
 }
 
-func (c Conn) WriteMsg() {
+func (c Conn) WriteMsg(msg *Message) {
+	var buf *bytes.Buffer
+	msg.Compress(&buf)
+	defer func() {
+		utils.BytesBufferPool.Put(buf)
+		_ = c.w.Flush()
+	}()
 
 }

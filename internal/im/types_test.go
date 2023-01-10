@@ -1,24 +1,29 @@
 package im
 
 import (
-	"fmt"
+	"bytes"
 	"github.com/zzztttkkk/ink/internal/utils"
 	"testing"
 )
 
-func TestA(t *testing.T) {
+func TestMessage_Compress(t *testing.T) {
 	msg := Message{
 		From: 12,
 	}
 
-	for i := 0; i < 1024*1024; i++ {
-		msg.Content = append(msg.Content, 'A')
+	for i := 0; i < 1024; i++ {
+		msg.Content = append(msg.Content, "HX=="...)
 	}
 
-	buf := msg.Compress()
+	rl := len(msg.Content)
+
+	var buf *bytes.Buffer
+	msg.Compress(&buf)
 	defer utils.BytesBufferPool.Put(buf)
 
 	msg.Uncompress()
 
-	fmt.Println(1)
+	if len(msg.Content) != rl {
+		t.Fail()
+	}
 }

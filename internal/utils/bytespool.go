@@ -13,6 +13,13 @@ var (
 
 func (_BytesBufferPoolNamespace) Get() *bytes.Buffer { return bufPool.Get().(*bytes.Buffer) }
 
-func (_BytesBufferPoolNamespace) Put(v *bytes.Buffer) { bufPool.Put(v) }
+func (_BytesBufferPoolNamespace) Put(v *bytes.Buffer) {
+	if v == nil {
+		return
+	}
+
+	v.Reset()
+	bufPool.Put(v)
+}
 
 var BytesBufferPool _BytesBufferPoolNamespace

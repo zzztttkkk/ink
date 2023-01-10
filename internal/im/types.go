@@ -28,8 +28,8 @@ type Message struct {
 	Unix    uint64
 	Until   uint64
 	Type    MessageType
-	Content []byte
 	Ext     map[string]string
+	Content []byte
 }
 
 // IsCompressed
@@ -41,19 +41,25 @@ func (msg *Message) IsCompressed() bool {
 	return msg.Content[0] == 0x1f && msg.Content[1] == 0x8b
 }
 
-func (msg *Message) Compress() *bytes.Buffer {
+func (msg *Message) Compress(pptr **bytes.Buffer) {
 	if len(msg.Content) < 512 {
-		return nil
+		return
 	}
 
 	buf := utils.BytesBufferPool.Get()
+	*pptr = buf
+
 	w := gzip.NewWriter(buf)
-	_, e := w.Write(msg.Content)
-	if e != nil {
-		panic(e)
-	}
-	msg.Content = buf.Bytes()
-	return buf
+
+	defer func() {
+		if e := w.Close(); e != nil {
+			panic(e)
+		}
+		msg.Content = buf.Bytes()
+	}()
+
+	_, _ = w.Write(msg.Content)
+	return
 }
 
 func (msg *Message) Uncompress() {
@@ -62,16 +68,14 @@ func (msg *Message) Uncompress() {
 	if e != nil {
 		panic(e)
 	}
+	defer r.Close()
 
 	msg.Content = nil
 
-	var buf [128]byte
+	var buf [256]byte
 	for {
 		l, e := r.Read(buf[:])
-		if e != nil {
-			if e == io.EOF {
-				break
-			}
+		if e != nil && e != io.EOF {
 			panic(e)
 		}
 		if l < 1 {
